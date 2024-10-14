@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/services/auth_service.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -13,6 +14,8 @@ class _SignUpState extends State<SignUp> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   bool _showPassword = false;
+  bool _isLoading = false;
+  String? _errorFeedback;
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -75,13 +78,29 @@ class _SignUpState extends State<SignUp> {
             ],
           ),
           const SizedBox(height: 16,),
+
+        if(_errorFeedback != null)
+          Text(_errorFeedback!, style: const TextStyle(color: Colors.red),),
+          _isLoading ? 
+          const Center(child: CircularProgressIndicator(),) :
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white
             ),
-            onPressed: (){
-
+            onPressed: ()async{
+              setState(() {
+                _errorFeedback = null;
+                _isLoading = true;
+              });
+              final name = _nameController.text.trim();
+              final email = _emailController.text.trim();
+              final password = _passwordController.text.trim();
+              final user = await AuthService.signUp(email, password);
+              if(user == null){
+                _errorFeedback = "Email already existed";
+              }
+              _isLoading = false;
           }, child: const Text("Sign up"))
         ],
       ));

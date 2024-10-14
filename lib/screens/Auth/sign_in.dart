@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/services/auth_service.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -12,6 +13,8 @@ class _SignInState extends State<SignIn> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _showPassword = false;
+  String? _errorFeedback;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +26,7 @@ class _SignInState extends State<SignIn> {
           const Center(
             child: Text("Sign in to your account", style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w500
+              fontWeight: FontWeight.w500,
             ),)
           ),
 
@@ -64,12 +67,32 @@ class _SignInState extends State<SignIn> {
             ],
           ),
           const SizedBox(height: 16,),
+          if(_errorFeedback != null)
+            Center(child: Text(_errorFeedback!, style: const TextStyle(color: Colors.red),),),
+
+          _isLoading ?
+          const Center(child: CircularProgressIndicator(),):
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white
             ),
-            onPressed: (){
+            onPressed: ()async{
+              setState(() {
+                _isLoading = true;
+                _errorFeedback = null;
+              });
+              final email = _emailController.text.trim();
+              final password = _passwordController.text.trim();
+
+              final user = await AuthService.signIn(email, password);
+
+              if(user == null){
+                _errorFeedback = "Incorrect user information";
+              }
+             setState(() {
+                _isLoading = false;
+             });
 
           }, child: const Text("Sign in"))
         ],

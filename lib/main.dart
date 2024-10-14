@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_todo_app/models/app_user.dart';
+import 'package:flutter_todo_app/providers/auth_provider.dart';
 import 'package:flutter_todo_app/screens/Auth/welcome.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_todo_app/screens/home.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -11,8 +21,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home:  Welcome(),
+    return  MaterialApp(
+      home:  Consumer(builder: (context, ref, child){
+        final AsyncValue<AppUser?> user= ref.watch(authProvider);
+
+        return user.when(data: (value){
+          if(value == null){
+            return const Welcome();
+          }
+          return const Home();
+        }, error: (error, _) => const Text("Error while logging in."), loading: () => const Text("Loading"));
+      }),
     );
   }
 }
