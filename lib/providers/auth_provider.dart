@@ -15,3 +15,4 @@ final authProvider = StreamProvider.autoDispose<AppUser?>((ref) async* {
     yield user;
   }
 });
+

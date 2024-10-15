@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/models/user.dart';
 import 'package:flutter_todo_app/services/auth_service.dart';
+import 'package:flutter_todo_app/services/user_service.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -9,10 +11,10 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _nameController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   bool _showPassword = false;
   bool _isLoading = false;
   String? _errorFeedback;
@@ -99,6 +101,8 @@ class _SignUpState extends State<SignUp> {
               final user = await AuthService.signUp(email, password);
               if(user == null){
                 _errorFeedback = "Email already existed";
+              }else{
+                UserService.createUser(User(uid: user.uid, email: user.email, name: name));
               }
               _isLoading = false;
           }, child: const Text("Sign up"))

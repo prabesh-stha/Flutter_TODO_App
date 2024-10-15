@@ -91,6 +91,7 @@ class _SignInState extends State<SignIn> {
                 _errorFeedback = "Incorrect user information";
               }
              setState(() {
+              _passwordController.text = "";
                 _isLoading = false;
              });
 
